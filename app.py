@@ -22,6 +22,8 @@ dictionary={}
 # YOLO_Video is the python file which contains the code for our object detection model
 #Video Detection is the Function which performs Object Detection on Input Video
 from YOLO_Video import video_detection
+from server import main as start_server
+from client import start_client
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'Falgun'
@@ -84,7 +86,7 @@ def generate_frames(path_x=''):
                     for car_id, data in output.items():
                         plate = Plates(license_plate=data['licence_plate_number'])
                         db.session.add(plate)
-                    db.session.commit()
+                    db.session.commit() 
                     
 
 
@@ -113,6 +115,7 @@ def home():
         session['username']=username
         session['userId']=userId
         session['license_final']={}
+        session['helloworld']=True
         print(username,user.id)
         return redirect(url_for('front'))
     return render_template('indexproject.html')
@@ -126,6 +129,25 @@ def webcam():
     session.clear()
     return render_template('ui.html')
 
+@app.route('/start_server_route', methods=['POST'])
+def start_server_route():
+    # Execute the server startup code from server.py
+     if 'helloworld' in session and session['helloworld'] is True:
+        # If condition is met, execute the server startup code from server.py
+        print("Server started successfully")
+        start_server()
+        session['helloworld']=False
+    # return jsonify({'message': 'Server started successfully'})
+
+@app.route('/start_client_route', methods=['POST'])
+def start_client_route():
+    
+    start_client()
+    print("client started successfully")
+    return 'client started successfully'  # Return
+
+   
+    # return jsonify({'message': 'Server started successfully'})
 
 
 @app.route('/front', methods=['GET','POST'])
