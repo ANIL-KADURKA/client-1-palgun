@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response,jsonify,request,session,redirect,url_for
+from flask import Flask, render_template, Response,jsonify,request,session,redirect,url_for,json
 
 #FlaskForm--> it is required to receive input from the user
 # Whether uploading a video file  to our object detection model
@@ -32,6 +32,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 
 db = SQLAlchemy(app)
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -42,8 +43,16 @@ class Plates(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     license_plate = db.Column(db.String(20), nullable=False)
  
- 
+from datetime import datetime
 
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    text = db.Column(db.String(200), nullable=False)
+
+   
 #Use FlaskForm to get input video file  from user
 class UploadFileForm(FlaskForm):
     #We store the uploaded video file path in the FileField in the variable file
@@ -51,19 +60,6 @@ class UploadFileForm(FlaskForm):
     #video when prompted to do so
     file = FileField("File",validators=[InputRequired()])
     submit = SubmitField("Run")
-
-
-# def generate_frames(path_x = ''):
-#     yolo_output = video_detection(path_x)
-    
-
-
-#     # for detection_ in a:
-#     #     ref,buffer=cv2.imencode('.jpg',detection_)
-
-#     #     frame=buffer.tobytes()
-#     #     yield (b'--frame\r\n'
-#     #                 b'Content-Type: image/jpeg\r\n\r\n' + frame +b'\r\n')
 
 
 def generate_frames(path_x=''):
@@ -112,16 +108,71 @@ def home():
             db.session.add(user)
             db.session.commit()
         userId=user.id
+        print(userId)
         session['username']=username
         session['userId']=userId
+        print(session['userId'])
         session['license_final']={}
         session['helloworld']=True
         print(username,user.id)
         return redirect(url_for('front'))
     return render_template('indexproject.html')
-# Rendering the Webcam Rage
-#Now lets make a Webcam page for the application
-#Use 'app.route()' method, to render the Webcam page at "/webcam"
+
+
+@app.route('/store_username', methods=['POST'])
+def store_username():
+    username = request.form['username']  # Get the username from the request data
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        print(username)
+        # Create a new user if not present in the database
+        user = User(username=username)
+        print(user)
+        db.session.add(user)
+        print("half")
+        db.session.commit()
+        print("full")
+
+        return 'Username stored successfully'
+    else:
+        return "username already stored"
+
+
+def insert_or_append_message(sender_id, receiver_id, message_data):
+    existing_message = Message.query.filter_by(sender_id=sender_id, receiver_id=receiver_id).first()
+    if existing_message:
+        existing_data = json.loads(existing_message.text)
+        new_index=len(existing_data)+1
+        existing_data[new_index] = message_data
+        existing_message.text = json.dumps(existing_data)
+    else:
+        # If no entry exists, create a new message entry
+        new_message = Message(sender_id=sender_id, receiver_id=receiver_id, data=json.dumps([message_data]))
+        db.session.add(new_message)
+    db.session.commit()
+
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    recipient_id = request.form['recipient_id']  # Get the recipient ID (license plate)
+    print(recipient_id)
+    content = request.form['content']  # Get the message content
+    print(content)
+    sender_id = session.get('userId')  # Get the sender ID from the session
+    print(sender_id)
+    # Assuming you have logic to determine the category (e.g., 'a') based on sender_id
+    category = 'a'  # Replace with your logic
+    # Prepare the message data
+    message_data = [category,content,str(datetime.now())]
+    insert_or_append_message(sender_id, recipient_id, message_data)
+    # Here, you can store the message_data in the database or perform any other operations
+    return jsonify({'message': 'Message sent successfully'})
+
+
+@app.route('/view_messages/<int:recipient_id>')
+def view_messages(recipient_id):
+    messages = Message.query.filter_by(recipient_id=recipient_id).all()
+    return render_template('messages.html', messages=messages)
 
 
 @app.route("/webcam", methods=['GET','POST'])

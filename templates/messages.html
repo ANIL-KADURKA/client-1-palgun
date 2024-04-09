@@ -1,0 +1,51 @@
+<!-- templates/messages.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+</head>
+<body>
+    <!-- Modal for displaying messages -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Messages</h2>
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message.content }}</li>
+                {% endfor %}
+            </ul>
+            <form action="/send_message" method="post">
+                <input type="hidden" name="recipient_id" value="{{ recipient_id }}">
+                <textarea name="content" cols="30" rows="5" placeholder="Enter your reply"></textarea>
+                <button type="submit">Reply</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById("messageModal");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        modal.style.display = "block";
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

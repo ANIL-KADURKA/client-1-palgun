@@ -161,11 +161,32 @@
 
     </div>
 
-    </div>
+    <!-- Chat Modal -->
+<!-- Chat Modal -->
+<div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" style="color: black;" id="chatModalLabel">Chat</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <p id="recipient_id_paragraph"></p> <!-- Display recipient ID here -->
+              <div class="mb-3">
+                  <label for="content" class="form-label">Message</label>
+                  <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+              </div>
+              <button id="sendMessageBtn" type="button" class="btn btn-primary">Send</button>
+          </div>
+      </div>
+  </div>
+</div>
 
+  </body>
 
     
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" ></script>
     <script>
       function fetchData() {
         fetch('/get_data') // Make a GET request to your Flask API endpoint
@@ -177,6 +198,7 @@
             data.forEach(item => {
               const div = document.createElement('button');
               div.textContent = `${item.license_plate}`; 
+              // Add recipient ID attribute
               div.className="btn btn-primary m-3 p-2"
               dataContainer.appendChild(div);
             });
@@ -185,42 +207,125 @@
             console.error('Error fetching data:', error);
           });
       }
-      
-     
-    $(document).ready(function () {
-      $('#startServerBtn').click(function () {
-        $.ajax({
-          type: 'POST',
-          url: '/start_server_route',
-          success: function (response) {
-            console.log(response.message);
-            $('#connectionStatus').text('Successfully connected');
-          },
-          error: function (xhr, status, error) {
-            console.error(error);
-            $('#connectionStatus').text('Not connected');
-          }
-        });
-      });
-    });
+    $(document).on('click', '.btn-primary', function () {
+    var licensePlate = $(this).text(); // Extract the license plate number
+    console.log(licensePlate)
+    storeUsername(licensePlate); // Store the license plate number as the username
+    $('#recipient_id_paragraph').text(licensePlate); // Set the recipient ID in the paragraph element
+    $('#chatModal').modal('show'); // Show the chat modal
+  });
 
-    $(document).ready(function () {
-      $('#startClientBtn').click(function () {
-        $.ajax({
-          type: 'POST',
-          url: '/start_client_route',
-          success: function (response) {
-            console.log(response.message);
-            $('#connectionStatus').text('Successfully connected');
-          },
-          error: function (xhr, status, error) {
-            console.error(error);
-            $('#connectionStatus').text('Not connected');
-          }
-        });
-      });
+  // Function to store the username (license plate number) in the database
+  function storeUsername(username) {
+    $.ajax({
+      type: 'POST',
+      url: '/store_username', // Update this URL to your Flask route for storing the username
+      data: { username: username }, // Send the username as data
+      success: function (response) {
+        console.log('Username stored successfully:', response);
+      },
+      error: function (xhr, status, error) {
+        console.error('Error storing username:', error);
+      }
     });
-    </script>
-  </body>
+  }
+  function sendMessageToBackend() {
+    var recipientId = $('#recipient_id_paragraph').text(); // Get recipient ID
+    var content = $('#content').val(); // Get message content
+    console.log(recipientId)
+    // Send message data to the backend using AJAX
+    $.ajax({
+      type: 'POST',
+      url: '/send_message',
+      data: {
+        recipient_id: recipientId,
+        content: content
+      },
+      success: function(response) {
+        console.log(response); // Log success response
+        // Optionally, you can perform any actions after sending the message
+      },
+      error: function(xhr, status, error) {
+        console.error(error); // Log error message
+        // Optionally, you can handle errors here
+      }
+    });
+  }
 
-  </html>
+  // Event listener for clicking the "Send" button
+  $(document).on('click', '#sendMessageBtn', function() {
+    sendMessageToBackend(); // Call function to send message to backend
+  });  
+    // $(document).ready(function () {
+    //   $('#startServerBtn').click(function () {
+    //     $.ajax({
+    //       type: 'POST',
+    //       url: '/start_server_route',
+    //       success: function (response) {
+    //         console.log(response.message);
+    //         $('#connectionStatus').text('Successfully connected');
+    //       },
+    //       error: function (xhr, status, error) {
+    //         console.error(error);
+    //         $('#connectionStatus').text('Not connected');
+    //       }
+    //     });
+    //   });
+    // });
+
+    // $(document).ready(function () {
+    //   $('#startClientBtn').click(function () {
+    //     $.ajax({
+    //       type: 'POST',
+    //       url: '/start_client_route',
+    //       success: function (response) {
+    //         console.log(response.message);
+    //         $('#connectionStatus').text('Successfully connected');
+    //       },
+    //       error: function (xhr, status, error) {
+    //         console.error(error);
+    //         $('#connectionStatus').text('Not connected');
+    //       }
+    //     });
+    //   });
+    // });
+    
+    // function openChatModal(recipientId) {
+    //   $('#recipient_id').val(recipientId);
+    //     $('#chatModal').modal('show');
+    // }
+
+    // // Event listener to open the chat modal when a button is clicked
+    // $(document).on('click', '.btn-primary', function () {
+    //     console.log("hi")
+    //     var recipientId = $(this).data('recipient-id');
+    //     openChatModal(recipientId);
+    // });
+
+    // AJAX request to send the chat message
+    // $('#chatForm').submit(function (event) {
+    //     event.preventDefault();
+    //     $.ajax({
+    //         type: 'POST',
+    //         url: $(this).attr('action'),
+    //         data: $(this).serialize(),
+           
+    //         success: function (response) {
+    //             // Handle success
+    //             console.log(response);
+    //         },
+    //         error: function (xhr, status, error) {
+    //             // Handle error
+    //             console.error(error);
+    //         }
+    //     });
+  
+    //   });
+  </script>
+ 
+
+ <style>
+  #recipient_id_paragraph{
+    color:black;
+  }
+ </style>
