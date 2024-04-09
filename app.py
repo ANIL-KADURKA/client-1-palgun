@@ -114,6 +114,7 @@ def home():
         print(session['userId'])
         session['license_final']={}
         session['helloworld']=True
+        Plates.query.delete()
         print(username,user.id)
         return redirect(url_for('front'))
     return render_template('indexproject.html')
@@ -121,11 +122,10 @@ def home():
 
 @app.route('/store_username', methods=['POST'])
 def store_username():
-    username = request.form['username']  # Get the username from the request data
+    username = request.form['username']  
     user = User.query.filter_by(username=username).first()
     if user is None:
         print(username)
-        # Create a new user if not present in the database
         user = User(username=username)
         print(user)
         db.session.add(user)
@@ -154,18 +154,15 @@ def insert_or_append_message(sender_id, receiver_id, message_data):
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
-    recipient_id = request.form['recipient_id']  # Get the recipient ID (license plate)
-    print(recipient_id)
-    content = request.form['content']  # Get the message content
-    print(content)
-    sender_id = session.get('userId')  # Get the sender ID from the session
+    receiver_name = request.form['receiver_name'] 
+    content = request.form['content']  
+    sender_id = session.get('userId')  
     print(sender_id)
-    # Assuming you have logic to determine the category (e.g., 'a') based on sender_id
-    category = 'a'  # Replace with your logic
-    # Prepare the message data
+    print(receiver_name)
+    print(content)
+    category = 'a'  
     message_data = [category,content,str(datetime.now())]
     insert_or_append_message(sender_id, recipient_id, message_data)
-    # Here, you can store the message_data in the database or perform any other operations
     return jsonify({'message': 'Message sent successfully'})
 
 
@@ -180,25 +177,6 @@ def webcam():
     session.clear()
     return render_template('ui.html')
 
-@app.route('/start_server_route', methods=['POST'])
-def start_server_route():
-    # Execute the server startup code from server.py
-     if 'helloworld' in session and session['helloworld'] is True:
-        # If condition is met, execute the server startup code from server.py
-        print("Server started successfully")
-        start_server()
-        session['helloworld']=False
-    # return jsonify({'message': 'Server started successfully'})
-
-@app.route('/start_client_route', methods=['POST'])
-def start_client_route():
-    
-    start_client()
-    print("client started successfully")
-    return 'client started successfully'  # Return
-
-   
-    # return jsonify({'message': 'Server started successfully'})
 
 
 @app.route('/front', methods=['GET','POST'])
@@ -234,13 +212,15 @@ def video():
 
 @app.route('/get_data', methods=['GET'])
 def get_data():
-    # Query the database to fetch all data
     data = Plates.query.all()
+    
+    username = session['username']
 
-    # Construct a list of dictionaries with id and license_plate
-    response_data = [{'id': item.id, 'license_plate': item.license_plate} for item in data]
+    user_id=session['userId']
 
-    # Return the JSON response
+    print(username,user_id,data)
+    response_data = {'data': [{'id': item.id, 'license_plate': item.license_plate} for item in data], 'username': username,'user_id':user_id}
+
     return jsonify(response_data)
 
 @app.route('/webapp')

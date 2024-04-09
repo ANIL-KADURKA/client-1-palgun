@@ -1,331 +1,298 @@
-  <!DOCTYPE html>
-  <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Flask App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='images/style.css') }}" />
-    <style>
-      body {
-        color: white;
-        margin: 0px;
-        padding: 0px;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Flask App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='images/style.css') }}" />
+  <style>
+    body {
+      color: white;
+      margin: 0px;
+      padding: 0px;
+    }
 
-      header.feature-box.top {
-        background-color: black;
-        height: 100px;
-        margin: 0px;
-        padding: 20px;
-        text-align: center;
-      }
+    section.col-sm {
+      background-color: black;
+      width: 1000px;
+      height: 650px;
+      border-radius: 35px;
+      object-fit: contain;
+      margin: 40px;
+    }
 
-      header.feature-box.second {
-        background-color: blue;
-        height: 50px;
-        text-align: center;
-        margin-top: -25px;
-      }
+    section.col-sm2 {
+      background-color: wheat;
+      width: 500px;
+      height: 500px;
+      border-radius: 35px;
+      object-fit: contain;
+      margin: 40px;
+    }
 
-      .features {
-        background-color: black;
-        width: 900px;
-        height: 700px;
-        border-radius: 35px;
-        object-fit: contain;
-        margin: 20px;
-      }
+    img {
+      width: 900px;
+      height: 600px;
+      border-radius: 35px;
+      object-fit: contain;
+      margin: 40px;
+    }
 
-      section.col-sm {
-        background-color: black;
-        width: 1000px;
-        height: 650px;
-        border-radius: 35px;
-        object-fit: contain;
-        margin: 40px;
-      }
+    .form-container {
+      display: flex;
+      width: 500px;
+      height: 200px;
+      padding: 20px;
+      margin-left: 30px;
+      background-color: wheat;
+      border-radius: 8px;
+      outline: none;
+    }
 
-      section.col-sm2 {
-        background-color: wheat;
-        width: 500px;
-        height: 500px;
-        border-radius: 35px;
-        object-fit: contain;
-        margin: 40px;
-      }
+    .bg-container {
+      height: auto;
+      width: auto;
+      padding: 10px 50px;
+    }
 
-      img {
-        width: 900px;
-        height: 600px;
-        border-radius: 35px;
-        object-fit: contain;
-        margin: 40px;
-      }
+    .btn-container {
+      margin-top: 20px;
+    }
 
+    .custom-file-input {
+      background-color: white;
+      color: black;
+      border-radius: 12px;
+      width: 400px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
 
-      .form-container {
-        display: flex;
-        width: 500px;
-        height: auto;
-        padding: 20px;
-        margin-left: 30px;
-        background-color: wheat;
-        border-radius: 8px;
-        outline: none;
+    .custom-file-input:hover {
+      background-color: whitesmoke;
+    }
 
-      }
+    .navbar-container {
+      height: 60px;
+      width: 100%;
+    }
 
-      .bg-container {
-        height: 94vh;
-        width: 100vw;
-        padding: 10px 50px;
-      }
+    .list-group {
+      width: 80%;
+      height: 400px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      overflow-y: auto;
+      padding: 10px;
+      background-color: #f8f9fa;
+    }
 
-      .btn-container {
-        margin-top: 20px;
-      }
+    .form-stuff {
+      resize: none;
+      overflow: none;
+    }
 
-      .custom-file-input {
-        background-color: white;
-        color: black;
-        border-radius: 12px;
-        width: 400px;
-        padding: 10px 15px;
-        cursor: pointer;
-      }
+    .chat-bubble {
+      list-style: none;
+      margin: 5px 0px;
+      padding: 5px 30px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      color: white;
+      font-size: 14px;
+      border-radius: 6px;
+    }
 
+    .bubble-left {
+      background-color: green;
+      float: left;
+      align-self: flex-start;
+      border-bottom-right-radius: 0px;
+    }
 
+    .bubble-right {
+      background-color: #007bff;
+      color: white;
+      float: right;
+      align-self: flex-end;
+      border-top-left-radius: 0px;
+    }
 
-      .custom-file-input:hover {
-        background-color: whitesmoke;
-      }
-    </style>
-  </head>
+    .from-name {
+      color: black;
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
 
-  <body>
+    .title {
+      color: black;
+      font-size: 29px;
 
-    <nav class="navbar navbar-light bg-dark navbar-container">
-      <div class="container-fluid d-flex justify-content-center align-items-center">
-        <span class="navbar-brand mb-0 ps-5 text-white h1">License Plate Networking App</span>
-      </div>
-    </nav>
+    }
+  </style>
+</head>
 
-
-    <div class="bg-container">
-
-      <div class="d-flex flex-row ">
-
-        <section class="col-sm ">
-          <img src="{{ url_for('video') }}" alt="Upload video">
-        </section>
-
-  
-
-        <section  id="dataSection" class="col-sm2 ">
-          <button onclick="fetchData()" class="btn btn-secondary m-3 ">GET No Plates</button>
-          <button id="startServerBtn" class="btn btn-success m-3">Connect to Server</button>
-          <button id="startClientBtn" class="btn btn-danger m-3">client</button>
-          <div id="dataContainer"></div>
-        </section>
-
-        
-        
-
-      </section>
-
-
-
-      </div>
-      <section>
-
-        <div class="form-container">
-          <form method='POST' enctype="multipart/form-data">
-            {{form.hidden_tag()}}
-            {{form.file(class_="custom-file-input")}}
-            <div class="btn-container">
-              <button type="submit" name="favorite" value="x" class="btn btn-primary">
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
-      </section>  
-
-
-
-
+<body>
+  <nav class="navbar navbar-light bg-dark navbar-container">
+    <div class="container-fluid d-flex justify-content-center align-items-center">
+      <span class="text-white"><strong> License Plate Networking App</strong></span>
     </div>
+  </nav>
 
-    <!-- Chat Modal -->
-<!-- Chat Modal -->
-<div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
+  <div class="bg-container">
+    <div>
+      <section class="col-sm">
+        <img src="{{ url_for('video') }}" alt="Upload video" />
+      </section>
+    </div>
+    <section class="d-flex justify-content-space-around align-items-flex-start">
+      <div class="form-container">
+        <form method="POST" enctype="multipart/form-data">
+          {{form.hidden_tag()}} {{form.file(class_="custom-file-input")}}
+          <div class="btn-container">
+            <button type="submit" name="favorite" value="x" class="btn btn-success">
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <section id="dataSection" class="col-sm2">
+        <button onclick="fetchData()" class="btn btn-secondary m-3">
+          Get Plates
+        </button>
+
+        <div id="dataContainer"></div>
+      </section>
+    </section>
+    <div class="modal fade modal-stuff" id="myModal">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
           <div class="modal-header">
-              <h5 class="modal-title" style="color: black;" id="chatModalLabel">Chat</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h4 class="title">CHAT APP</h4>
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
           </div>
           <div class="modal-body">
-              <p id="recipient_id_paragraph"></p> <!-- Display recipient ID here -->
-              <div class="mb-3">
-                  <label for="content" class="form-label">Message</label>
-                  <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+            <h3 class="from-name" id="fromName"></h3>
+            <h3 class="from-name" id="toName"></h3>
+            <ul class="list-group">
+              <li class="list-item chat-bubble bubble-left">List Item 1</li>
+              <li class="list-item chat-bubble bubble-left">List Item 2</li>
+              <li class="list-item chat-bubble bubble-right">List Item 3</li>
+              <li class="list-item chat-bubble bubble-right">List Item 4</li>
+              <li class="list-item chat-bubble bubble-left">List Item 5</li>
+              <li class="list-item chat-bubble bubble-right">List Item 6</li>
+              <li class="list-item chat-bubble bubble-left">List Item 7</li>
+              <li class="list-item chat-bubble bubble-right">List Item 8</li>
+              <li class="list-item chat-bubble bubble-left">List Item 5</li>
+              <li class="list-item chat-bubble bubble-right">List Item 6</li>
+              <li class="list-item chat-bubble bubble-left">List Item 7</li>
+              <li class="list-item chat-bubble bubble-right">List Item 8</li>
+            </ul>
+            <form id="messageForm" class="needs-validation" method="POST">
+              <div class="form-group">
+                <textarea class="form-control mt-3 mb-3 form-stuff" rows="4" cols="4" name="message_text" id="message_value" placeholder="Enter message" required></textarea>
               </div>
-              <button id="sendMessageBtn" type="button" class="btn btn-primary">Send</button>
+              <button type="submit" class="btn btn-primary"  id="sendMessage">Send</button>
+            </form>
+            
           </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
       </div>
+    </div>
   </div>
-</div>
+</body>
 
-  </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" ></script>
-    <script>
-      function fetchData() {
-        fetch('/get_data') // Make a GET request to your Flask API endpoint
-          .then(response => response.json())
-          .then(data => {
-            // Display the fetched data below the button
-            const dataContainer = document.getElementById('dataContainer');
-            dataContainer.innerHTML = ''; // Clear previous content
-            data.forEach(item => {
-              const div = document.createElement('button');
-              div.textContent = `${item.license_plate}`; 
-              // Add recipient ID attribute
-              div.className="btn btn-primary m-3 p-2"
-              dataContainer.appendChild(div);
-            });
-          })
-          .catch(error => {
-            console.error('Error fetching data:', error);
+<script>
+  function fetchData() {
+    console.log("Hello wrold")
+    fetch("/get_data")
+      .then((response) => response.json())
+      .then(({ data, username, user_id }) => {
+        console.log(data)
+        console.log(username)
+        console.log(user_id)
+        const dataContainer = document.getElementById("dataContainer");
+        dataContainer.innerHTML = "";
+        data.forEach((item) => {
+          const buttonElement = document.createElement("button");
+          buttonElement.textContent = `${item.license_plate}`;
+          buttonElement.id = `${item.license_plate}`;
+          buttonElement.className = "btn btn-primary m-3 p-2";
+          buttonElement.addEventListener("click", function () {
+            console.log(this.textContent);
+            storeUsername(this.textContent);
+            console.log("Jai Hind");
+            document.getElementById('fromName').innerText = "FROM: " + username
+            document.getElementById('toName').innerText = "TO: " + this.textContent;
+            $("#myModal").modal("show");
+            localStorage.setItem('receiver_name',this.textContent)
           });
-      }
-    $(document).on('click', '.btn-primary', function () {
-    var licensePlate = $(this).text(); // Extract the license plate number
-    console.log(licensePlate)
-    storeUsername(licensePlate); // Store the license plate number as the username
-    $('#recipient_id_paragraph').text(licensePlate); // Set the recipient ID in the paragraph element
-    $('#chatModal').modal('show'); // Show the chat modal
-  });
+          dataContainer.appendChild(buttonElement);
+          localStorage.setItem('user_id', user_id)
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }
 
-  // Function to store the username (license plate number) in the database
   function storeUsername(username) {
     $.ajax({
-      type: 'POST',
-      url: '/store_username', // Update this URL to your Flask route for storing the username
-      data: { username: username }, // Send the username as data
+      type: "POST",
+      url: "/store_username",
+      data: { username: username },
       success: function (response) {
-        console.log('Username stored successfully:', response);
+        console.log("Username stored successfully:", response);
       },
       error: function (xhr, status, error) {
-        console.error('Error storing username:', error);
-      }
+        console.error("Error storing username:", error);
+      },
     });
   }
-  function sendMessageToBackend() {
-    var recipientId = $('#recipient_id_paragraph').text(); // Get recipient ID
-    var content = $('#content').val(); // Get message content
-    console.log(recipientId)
-    // Send message data to the backend using AJAX
+
+  $(document).ready(function() {
+    $('#messageForm').on('submit', function(event) {
+      event.preventDefault(); 
+      send_message_to_backend();
+    });
+  })
+
+  function send_message_to_backend() {
+    var content = $("#message_value").val(); 
+    const receiver_name = localStorage.getItem('receiver_name')
     $.ajax({
-      type: 'POST',
-      url: '/send_message',
+      type: "POST",
+      url: "/send_message",
       data: {
-        recipient_id: recipientId,
-        content: content
+        content: content,
+        receiver_name:receiver_name
       },
-      success: function(response) {
-        console.log(response); // Log success response
-        // Optionally, you can perform any actions after sending the message
+      success: function (response) {
+        console.log(response);
       },
-      error: function(xhr, status, error) {
-        console.error(error); // Log error message
-        // Optionally, you can handle errors here
-      }
+      error: function (xhr, status, error) {
+        console.error(error);
+      },
     });
   }
+</script>
 
-  // Event listener for clicking the "Send" button
-  $(document).on('click', '#sendMessageBtn', function() {
-    sendMessageToBackend(); // Call function to send message to backend
-  });  
-    // $(document).ready(function () {
-    //   $('#startServerBtn').click(function () {
-    //     $.ajax({
-    //       type: 'POST',
-    //       url: '/start_server_route',
-    //       success: function (response) {
-    //         console.log(response.message);
-    //         $('#connectionStatus').text('Successfully connected');
-    //       },
-    //       error: function (xhr, status, error) {
-    //         console.error(error);
-    //         $('#connectionStatus').text('Not connected');
-    //       }
-    //     });
-    //   });
-    // });
-
-    // $(document).ready(function () {
-    //   $('#startClientBtn').click(function () {
-    //     $.ajax({
-    //       type: 'POST',
-    //       url: '/start_client_route',
-    //       success: function (response) {
-    //         console.log(response.message);
-    //         $('#connectionStatus').text('Successfully connected');
-    //       },
-    //       error: function (xhr, status, error) {
-    //         console.error(error);
-    //         $('#connectionStatus').text('Not connected');
-    //       }
-    //     });
-    //   });
-    // });
-    
-    // function openChatModal(recipientId) {
-    //   $('#recipient_id').val(recipientId);
-    //     $('#chatModal').modal('show');
-    // }
-
-    // // Event listener to open the chat modal when a button is clicked
-    // $(document).on('click', '.btn-primary', function () {
-    //     console.log("hi")
-    //     var recipientId = $(this).data('recipient-id');
-    //     openChatModal(recipientId);
-    // });
-
-    // AJAX request to send the chat message
-    // $('#chatForm').submit(function (event) {
-    //     event.preventDefault();
-    //     $.ajax({
-    //         type: 'POST',
-    //         url: $(this).attr('action'),
-    //         data: $(this).serialize(),
-           
-    //         success: function (response) {
-    //             // Handle success
-    //             console.log(response);
-    //         },
-    //         error: function (xhr, status, error) {
-    //             // Handle error
-    //             console.error(error);
-    //         }
-    //     });
-  
-    //   });
-  </script>
- 
-
- <style>
-  #recipient_id_paragraph{
-    color:black;
-  }
- </style>
+</html>
