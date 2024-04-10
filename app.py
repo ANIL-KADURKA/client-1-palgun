@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 
 import numpy as np
-
+from sqlalchemy import JSON
 
 from wtforms import FileField, SubmitField,StringField,DecimalRangeField,IntegerRangeField
 from werkzeug.utils import secure_filename
@@ -45,13 +45,12 @@ class Plates(db.Model):
  
 from datetime import datetime
 
-
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    text = db.Column(db.String(200), nullable=False)
-
+    s_messages = db.Column(JSON)
+    r_messages = db.Column(JSON)
    
 #Use FlaskForm to get input video file  from user
 class UploadFileForm(FlaskForm):
@@ -138,32 +137,53 @@ def store_username():
         return "username already stored"
 
 
-def insert_or_append_message(sender_id, receiver_id, message_data):
-    existing_message = Message.query.filter_by(sender_id=sender_id, receiver_id=receiver_id).first()
-    if existing_message:
-        existing_data = json.loads(existing_message.text)
-        new_index=len(existing_data)+1
-        existing_data[new_index] = message_data
-        existing_message.text = json.dumps(existing_data)
+def insert_or_append_message(sender_id, receiver_id, s_message_data,r_message_data):
+    s_existing_message = Message.query.filter_by(sender_id=sender_id, receiver_id=receiver_id).first()
+    if s_existing_message:
+        print("Exists")
+        existing_data = json.loads(s_existing_message.s_messages)
+        new_index=len(existing_data)
+        existing_data[str(new_index)] = s_message_data
+        s_existing_message.s_messages = json.dumps(existing_data)
     else:
-        # If no entry exists, create a new message entry
-        new_message = Message(sender_id=sender_id, receiver_id=receiver_id, data=json.dumps([message_data]))
+        print("not exists")
+        s_data={0:s_message_data}
+        new_message = Message(sender_id=sender_id, receiver_id=receiver_id,s_messages=json.dumps(s_data))
         db.session.add(new_message)
     db.session.commit()
+
+    r_existing_message = Message.query.filter_by(sender_id=receiver_id, receiver_id=sender_id).first()
+    if r_existing_message:
+        print("Exists")
+        existing_data = json.loads(r_existing_message.r_messages)
+        new_index=len(existing_data)
+        existing_data[str(new_index)] = r_message_data
+        r_existing_message.r_messages = json.dumps(existing_data)
+    else:
+        print("not exists")
+        r_data={0:r_message_data}
+        new_message = Message(sender_id=receiver_id, receiver_id=sender_id,r_messages=json.dumps(r_data))
+        db.session.add(new_message)
+    db.session.commit()
+    
+
 
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
     receiver_name = request.form['receiver_name'] 
+    receipient = User.query.filter_by(username=receiver_name).first()
     content = request.form['content']  
     sender_id = session.get('userId')  
     print(sender_id)
-    print(receiver_name)
-    print(content)
-    category = 'a'  
-    message_data = [category,content,str(datetime.now())]
-    insert_or_append_message(sender_id, recipient_id, message_data)
+    print(receipient.id)
+    print(content) 
+    s_message_data = ['a',content,str(datetime.now())]
+    r_message_data = ['b',content,str(datetime.now())]
+    insert_or_append_message(sender_id, receipient.id, s_message_data,r_message_data)
     return jsonify({'message': 'Message sent successfully'})
+
+
 
 
 @app.route('/view_messages/<int:recipient_id>')
@@ -222,6 +242,70 @@ def get_data():
     response_data = {'data': [{'id': item.id, 'license_plate': item.license_plate} for item in data], 'username': username,'user_id':user_id}
 
     return jsonify(response_data)
+
+@app.route('/get_chats', methods=['GET'])
+def get_chats():
+    userId =session['userId']
+    data = Message.query.filter_by(sender_id=userId).all()
+    print(data)
+    TOTAL=[]
+    if data:
+        for convo in data:
+            convo_king = User.query.filter_by(id=convo.receiver_id).first().username
+
+            total_chats_merged=[]
+
+            sender_messages_filtered=[]
+            
+            if convo.s_messages:
+                parsed_dict = json.loads(convo.s_messages) 
+                for key,val in parsed_dict.items():
+                    message=val[1]
+                    timestamp=val[2]
+                    category=val[0]
+                    c={'category':category,'message':message,'timestamp':timestamp}
+                    sender_messages_filtered.append(c)
+            receiver_messages_filtered=[]
+            if convo.r_messages:
+                parsed_dict2 = json.loads(convo.r_messages) 
+                for key,val in parsed_dict2.items():
+                    message=val[1]
+                    timestamp=val[2]
+                    category=val[0]
+                    c={'category':category,'message':message,'timestamp':timestamp}
+                    receiver_messages_filtered.append(c)
+
+            total_chats_merged = []
+
+            total_chats_merged.extend(sender_messages_filtered)
+            total_chats_merged.extend(receiver_messages_filtered)
+
+            total_chats_merged.sort(key=lambda x: x['timestamp'])
+
+
+            final_chat_messages = [{'category': message['category'], 'message': message['message']} for message in total_chats_merged]
+
+            usha  = {'user':convo_king,'list':final_chat_messages}
+            TOTAL.append(usha)
+
+    else:
+        return []
+
+    print(TOTAL)
+
+    for i in TOTAL:
+        username=i['user']
+        liste=i['list']
+        for k in liste:
+            print(k['category'])
+            print(k['message'])
+
+
+    
+    return TOTAL
+
+
+
 
 @app.route('/webapp')
 def webapp():
