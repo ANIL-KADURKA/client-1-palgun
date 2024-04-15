@@ -141,24 +141,35 @@ def insert_or_append_message(sender_id, receiver_id, s_message_data,r_message_da
     s_existing_message = Message.query.filter_by(sender_id=sender_id, receiver_id=receiver_id).first()
     if s_existing_message:
         print("Exists")
-        existing_data = json.loads(s_existing_message.s_messages)
-        new_index=len(existing_data)
-        existing_data[str(new_index)] = s_message_data
-        s_existing_message.s_messages = json.dumps(existing_data)
+        print(s_existing_message)
+        print(s_existing_message.s_messages)
+        if s_existing_message.s_messages:
+            existing_data = json.loads(s_existing_message.s_messages)
+            new_index=len(existing_data)
+            existing_data[str(new_index)] = s_message_data
+            s_existing_message.s_messages = json.dumps(existing_data)
+        else:
+            print("chammak chello")
+            s_data={0:s_message_data}
+            s_existing_message.s_messages = json.dumps(s_data)
     else:
         print("not exists")
         s_data={0:s_message_data}
-        new_message = Message(sender_id=sender_id, receiver_id=receiver_id,s_messages=json.dumps(s_data))
+        new_message = new_message = Message(sender_id=sender_id, receiver_id=receiver_id,s_messages=json.dumps(s_data))
         db.session.add(new_message)
     db.session.commit()
 
     r_existing_message = Message.query.filter_by(sender_id=receiver_id, receiver_id=sender_id).first()
     if r_existing_message:
         print("Exists")
-        existing_data = json.loads(r_existing_message.r_messages)
-        new_index=len(existing_data)
-        existing_data[str(new_index)] = r_message_data
-        r_existing_message.r_messages = json.dumps(existing_data)
+        if r_existing_message.r_messages:
+            existing_data = json.loads(r_existing_message.r_messages)
+            new_index=len(existing_data)
+            existing_data[str(new_index)] = r_message_data
+            r_existing_message.r_messages = json.dumps(existing_data)
+        else:
+            r_data={0:r_message_data}
+            r_existing_message.r_messages = json.dumps(r_data)
     else:
         print("not exists")
         r_data={0:r_message_data}
@@ -246,6 +257,7 @@ def get_data():
 @app.route('/get_chats', methods=['GET'])
 def get_chats():
     userId =session['userId']
+    print(userId)
     data = Message.query.filter_by(sender_id=userId).all()
     print(data)
     TOTAL=[]

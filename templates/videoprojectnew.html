@@ -485,6 +485,7 @@
         event.preventDefault();
         const receiver_name=localStorage.getItem('receiver_name')
         var content = $("#message_value").val();
+        localStorage.setItem('contentStuff',content)
         const ulContainer = document.getElementById("ulContainerChats");
         const liElement = document.createElement("li");
         liElement.id = content + receiver_name;
@@ -510,6 +511,7 @@
       $("#chatForm").on("submit", function (event) {
         event.preventDefault();
         var content = $("#chat_value").val();
+        localStorage.setItem('contentStuff',content)
         const ulContainer = document.getElementById("containerdChats");
         const liElement = document.createElement("li");
         liElement.id = content;
@@ -534,8 +536,15 @@
     });
 
     function send_message_to_backend() {
-      var content = $("#message_value").val();
-      const receiver_name = localStorage.getItem("receiver_name");
+      var content =localStorage.getItem('contentStuff')
+      var receiver_name = localStorage.getItem("receiver_name");
+      console.log("Hello world")
+      if (receiver_name===null){
+        const revert = document.getElementById('toNamee');
+        let a=revert.textContent
+        receiver_name= a.substring(4);
+      }
+      console.log(receiver_name)
       $.ajax({
         type: "POST",
         url: "/send_message",
