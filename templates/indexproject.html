@@ -62,9 +62,23 @@
               name="username"
             />
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" id="btnStuff"  onclick="hello()"  class="btn btn-primary">Submit</button>
         </form>
       </div>
     </div>
   </body>
+  <script>
+    function hello(){
+      const valElement = document.getElementById('exampleInputEmail1')
+      localStorage.setItem('username',valElement.value);
+      if (localStorage.getItem('user_id') !== null){
+        localStorage.removeItem('user_id')
+      }
+      if (localStorage.getItem('receiver_name')!== null){
+        localStorage.removeItem('receiver_name')
+      }
+
+    }
+
+  </script>
 </html>
